@@ -1,0 +1,16 @@
+{
+    "email":
+    {
+        "login": "XXX",
+        "pass": "XXX",
+        "from": "XXX@XXX.com",
+        "server": "smtp-relay.sendinblue.com",
+        "port": "465"
+    },
+    "watchers": [
+    {
+        "url": "https://www.nytimes.com",
+        "css": "h1",
+        "emails": ["someone@somewhere.com"]
+    }]
+}
