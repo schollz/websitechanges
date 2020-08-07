@@ -213,23 +213,27 @@ func (w *Watcher) capture() (diffFilename string, different bool, err error) {
 func diffImage(im1, im2, out string) (different bool, err error) {
 	im1f, err := os.Open(im1)
 	if err != nil {
+		log.Error(err)
 		return
 	}
 	defer im1f.Close()
 
 	img1, err := png.Decode(im1f)
 	if err != nil {
+		log.Error(err)
 		return
 	}
 
 	im2f, err := os.Open(im2)
 	if err != nil {
+		log.Error(err)
 		return
 	}
 	defer im2f.Close()
 
 	img2, err := png.Decode(im2f)
 	if err != nil {
+		log.Error(err)
 		return
 	}
 
@@ -242,10 +246,14 @@ func diffImage(im1, im2, out string) (different bool, err error) {
 	fSave, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE, 0644)
 	defer fSave.Close()
 	if err != nil {
+		log.Error(err)
 		return
 	}
 
 	err = jpeg.Encode(fSave, diffImg, &jpeg.Options{30})
+	if err != nil {
+		log.Error(err)
+	}
 	return
 }
 
