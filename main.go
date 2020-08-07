@@ -15,6 +15,10 @@ import (
 	"net/textproto"
 	"os"
 	"os/exec"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jordan-wright/email"
@@ -25,6 +29,7 @@ import (
 )
 
 var Threshold = 3
+var TimeTick = 1 * time.Minute
 
 func main() {
 	err := Run()
@@ -65,6 +70,9 @@ type Watcher struct {
 	URL         string   `json:"url"`
 	CSSSelector string   `json:"css"`
 	Emails      []string `json:"emails"`
+
+	id       string
+	lastFile string
 }
 
 func Watch(watchers []Watcher) (err error) {
@@ -88,7 +96,7 @@ func Watch(watchers []Watcher) (err error) {
 	done := make(chan bool)
 	for _, watcher := range watchers {
 		go func(watcher Watcher) {
-			err = watch(watcher)
+			err = watcher.watch()
 			if err != nil {
 				done <- true
 			}
@@ -98,66 +106,98 @@ func Watch(watchers []Watcher) (err error) {
 	return
 }
 
-func watch(watcher Watcher) (err error) {
+func (w *Watcher) watch() (err error) {
+	if w.CSSSelector == "" {
+		w.CSSSelector = "full"
+	}
+
+	h := sha1.New()
+	h.Write([]byte(w.URL + w.CSSSelector))
+	w.id = fmt.Sprintf("changes_%x", h.Sum(nil))
+	if !Exists(w.id) {
+		err = os.Mkdir(w.id, 0644)
+		if err != nil {
+			return
+		}
+	}
+
+	// find last file
+	files, err := ioutil.ReadDir(w.id)
+	if err != nil {
+		return
+	}
+
+	biggestNum := 1
+	for _, f := range files {
+		if !strings.HasSuffix(f.Name(), ".png") {
+			continue
+		}
+		num, _ := strconv.Atoi(strings.Split(f.Name(), ".")[0])
+		if num > biggestNum {
+			biggestNum = num
+			w.lastFile = path.Join(w.id, f.Name())
+			w.info(fmt.Sprintf("using last file: %s", w.lastFile))
+		}
+	}
+
 	for {
 		var diffFilename string
 		var different bool
-		diffFilename, different, err = capture(watcher.URL, watcher.CSSSelector)
+		diffFilename, different, err = w.capture()
 		if err != nil {
-			log.Errorf("error with %+v: %s", watcher, err.Error())
+			log.Errorf("error with %+v: %s", w, err.Error())
 			return
 		}
 		if different {
-			for _, to := range watcher.Emails {
-				err = SendEmail(to, "watch "+watcher.URL, "site has changed on "+time.Now().String(), diffFilename)
+			for _, to := range w.Emails {
+				err = SendEmail(to, "watch "+w.URL, "site has changed on "+time.Now().String(), diffFilename)
 				if err != nil {
 					log.Error(err)
 					return
 				}
-				log.Infof("%s[%s]: sent email to %s", watcher.URL, watcher.CSSSelector, to)
+				log.Infof("%s[%s]: sent email to %s", w.URL, w.CSSSelector, to)
 			}
 		}
 		_ = diffFilename
-		time.Sleep(1 * time.Minute)
+		time.Sleep(TimeTick)
 	}
 	return
 }
 
-func capture(urlToWatch, cssSelector string) (diffFilename string, different bool, err error) {
-	log.Infof("%s[%s]: capturing", urlToWatch, cssSelector)
-	h := sha1.New()
-	h.Write([]byte(urlToWatch + cssSelector))
-	id := fmt.Sprintf("%x", h.Sum(nil))
+func (w *Watcher) info(s string) {
+	log.Infof("[%s|%s] %s", w.URL, w.CSSSelector, s)
+}
 
-	if cssSelector == "" {
-		cssSelector = "full"
-	}
-	cmd := exec.Command("node", "screenshot.js", urlToWatch, id+"new.png", cssSelector)
+func (w *Watcher) capture() (diffFilename string, different bool, err error) {
+	w.info("capturing")
+
+	newFile := path.Join(w.id, time.Now().Format("20060102150405.00")+".png")
+	cmd := exec.Command("node", "screenshot.js", w.URL, newFile, w.CSSSelector)
 	err = cmd.Run()
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	if Exists(id+"old.png") && Exists(id+"new.png") {
-		diffFilename = id + "_diff_" + time.Now().Format("20060102150405") + ".jpg"
-		different, err = diffImage(id+"old.png", id+"new.png", diffFilename)
+	if Exists(w.lastFile) && Exists(newFile) {
+		_, f1 := filepath.Split(w.lastFile)
+		_, f2 := filepath.Split(newFile)
+		diffFilename = path.Join(w.id, "diff-"+f1+"-"+f2+".jpg")
+		different, err = diffImage(w.lastFile, newFile, diffFilename)
 		if err != nil {
 			log.Error(err)
 			return
 		}
 		if different {
-			log.Infof("%s[%s]: different!", urlToWatch, cssSelector)
+			w.info("different")
+			w.lastFile = newFile
 		} else {
 			os.Remove(diffFilename)
-			log.Infof("%s[%s]: no change", urlToWatch, cssSelector)
+			os.Remove(newFile)
+			w.info("no change")
 		}
-	}
-
-	err = os.Rename(id+"new.png", id+"old.png")
-	if err != nil {
-		log.Error(err)
-		return
+	} else {
+		w.lastFile = newFile
 	}
 
 	return

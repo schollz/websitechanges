@@ -10,7 +10,7 @@
     "watchers": [
     {
         "url": "https://www.nytimes.com",
-        "css": "h1",
+        "css": "h2 > span",
         "emails": ["someone@somewhere.com"]
     }]
 }
