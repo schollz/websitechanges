@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"crypto/tls"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"image/jpeg"
 	"image/png"
@@ -30,8 +31,14 @@ import (
 
 var Threshold = 3
 var TimeTick = 1 * time.Minute
+var flagFolder string
+
+func init() {
+	flag.StringVar(&flagFolder, "folder", ".", "folder to save data")
+}
 
 func main() {
+	flag.Parse()
 	err := Run()
 	if err != nil {
 		log.Error(err)
@@ -41,7 +48,7 @@ func main() {
 var config Config
 
 func Run() (err error) {
-	b, err := ioutil.ReadFile("config.json")
+	b, err := ioutil.ReadFile(path.Join(flagFolder, "config.json"))
 	if err != nil {
 		return
 	}
@@ -114,8 +121,8 @@ func (w *Watcher) watch() (err error) {
 	h := sha1.New()
 	h.Write([]byte(w.URL + w.CSSSelector))
 	w.id = fmt.Sprintf("changes_%x", h.Sum(nil))
-	if !Exists(w.id) {
-		err = os.Mkdir(w.id, 0644)
+	if !Exists(path.Join(flagFolder, w.id)) {
+		err = os.Mkdir(path.Join(flagFolder, w.id), 0644)
 		if err != nil {
 			return
 		}
@@ -135,7 +142,7 @@ func (w *Watcher) watch() (err error) {
 		num, _ := strconv.Atoi(strings.Split(f.Name(), ".")[0])
 		if num > biggestNum {
 			biggestNum = num
-			w.lastFile = path.Join(w.id, f.Name())
+			w.lastFile = path.Join(flagFolder, w.id, f.Name())
 			w.info(fmt.Sprintf("using last file: %s", w.lastFile))
 		}
 	}
@@ -171,7 +178,7 @@ func (w *Watcher) info(s string) {
 func (w *Watcher) capture() (diffFilename string, different bool, err error) {
 	w.info("capturing")
 
-	newFile := path.Join(w.id, time.Now().Format("20060102150405.00")+".png")
+	newFile := path.Join(flagFolder, w.id, time.Now().Format("20060102150405.00")+".png")
 	cmd := exec.Command("node", "screenshot.js", w.URL, newFile, w.CSSSelector)
 	err = cmd.Run()
 	if err != nil {
@@ -182,7 +189,7 @@ func (w *Watcher) capture() (diffFilename string, different bool, err error) {
 	if Exists(w.lastFile) && Exists(newFile) {
 		_, f1 := filepath.Split(w.lastFile)
 		_, f2 := filepath.Split(newFile)
-		diffFilename = path.Join(w.id, "diff-"+f1+"-"+f2+".jpg")
+		diffFilename = path.Join(flagFolder, w.id, "diff-"+f1+"-"+f2+".jpg")
 		different, err = diffImage(w.lastFile, newFile, diffFilename)
 		if err != nil {
 			log.Error(err)
