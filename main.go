@@ -24,6 +24,8 @@ import (
 	"github.com/yuin/goldmark"
 )
 
+var Threshold = 3
+
 func main() {
 	err := Run()
 	if err != nil {
@@ -184,10 +186,11 @@ func diffImage(im1, im2, out string) (different bool, err error) {
 		return
 	}
 
-	diffImg, _, insertions, _ := diffimage.DiffImage(img1, img2)
-	if insertions > 3 {
+	diffImg, _, insertions, _ := diffimage.DiffImage(img1, img2, true)
+	if insertions > Threshold {
 		different = true
 	}
+	log.Infof("found %d insertions", insertions)
 
 	fSave, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE, 0644)
 	defer fSave.Close()
