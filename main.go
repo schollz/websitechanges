@@ -50,10 +50,12 @@ var config Config
 func Run() (err error) {
 	b, err := ioutil.ReadFile(path.Join(flagFolder, "config.json"))
 	if err != nil {
+		log.Error(err)
 		return
 	}
 	err = json.Unmarshal(b, &config)
 	if err != nil {
+		log.Error(err)
 		return
 	}
 	err = Watch(config.Watchers)
@@ -88,6 +90,7 @@ func Watch(watchers []Watcher) (err error) {
 		log.Info("downloading hosts file")
 		err = DownloadFile("http://sbc.io/hosts/alternates/fakenews-gambling-porn-social/hosts", "hosts")
 		if err != nil {
+			log.Error(err)
 			return
 		}
 	}
@@ -96,6 +99,7 @@ func Watch(watchers []Watcher) (err error) {
 		cmd := exec.Command("npm", "i", "puppeteer")
 		err = cmd.Run()
 		if err != nil {
+			log.Error(err)
 			return
 		}
 	}
@@ -124,13 +128,15 @@ func (w *Watcher) watch() (err error) {
 	if !Exists(path.Join(flagFolder, w.id)) {
 		err = os.Mkdir(path.Join(flagFolder, w.id), 0644)
 		if err != nil {
+			log.Error(err)
 			return
 		}
 	}
 
 	// find last file
-	files, err := ioutil.ReadDir(w.id)
+	files, err := ioutil.ReadDir(path.Join(flagFolder, w.id))
 	if err != nil {
+		log.Error(err)
 		return
 	}
 
