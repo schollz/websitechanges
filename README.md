@@ -6,6 +6,27 @@ After writing a [website change script in Python](https://github.com/schollz/web
 
 In this version I'm using [puppeteer](https://github.com/puppeteer/puppeteer) to do the capturing. The puppeteer code first filters out any ads (to prevent new things appearing in screen) and then captures an image of a CSS-selected content. The change-detection happens in Go and sends an email with an image of the change when any is detected.
 
+## Example
+
+Here is an example of a change detected from the New York times headlines.
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/6550035/89665256-3d615a00-d88d-11ea-8fd3-dda51a4cd3f5.jpg">
+</p>
+
+The previous state is shown in red and the new state is shown in green.
+
+The `config.json` used was:
+
+```javascript
+{
+    "watchers": [
+    {
+        "url": "https://www.nytimes.com",
+        "css": "h2 > span",
+    }]
+}
+```
 ## Usage
 
 First make sure you have `node` and `go` installed on your system.
