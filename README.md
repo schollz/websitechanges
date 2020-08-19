@@ -23,7 +23,7 @@ The `config.json` used was:
     "watchers": [
     {
         "url": "https://www.nytimes.com",
-        "css": "h2 > span",
+        "css": "h2 > span"
     }]
 }
 ```
@@ -34,8 +34,8 @@ First make sure you have `node` and `go` installed on your system.
 Then download and build:
 
 ```
-> git clone https://github.com/schollz/websitechanges-go
-> cd websitechanges-go
+> git clone https://github.com/schollz/websitechanges
+> cd websitechanges
 > go build -v
 ```
 

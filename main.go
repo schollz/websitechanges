@@ -126,7 +126,7 @@ func (w *Watcher) watch() (err error) {
 	h.Write([]byte(w.URL + w.CSSSelector))
 	w.id = fmt.Sprintf("changes_%x", h.Sum(nil))
 	if !Exists(path.Join(flagFolder, w.id)) {
-		err = os.Mkdir(path.Join(flagFolder, w.id), 0644)
+		err = os.Mkdir(path.Join(flagFolder, w.id), os.ModePerm)
 		if err != nil {
 			log.Error(err)
 			return
