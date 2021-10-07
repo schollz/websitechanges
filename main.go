@@ -178,7 +178,7 @@ func (w *Watcher) watch() (err error) {
 			}
 		}
 		_ = diffFilename
-		time.Sleep(TimeTick)
+		time.Sleep(time.Duration(*TimeTick) * time.Minute)
 	}
 	return
 }
