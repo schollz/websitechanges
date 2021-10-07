@@ -30,7 +30,7 @@ import (
 )
 
 var Threshold = 3
-var TimeTick = 1 * time.Minute
+var TimeTick = flag.Int("delay", 5, "Time between script execution in minutes.  Default is 5 minutes")
 var flagFolder string
 
 func init() {
@@ -79,6 +79,7 @@ type Watcher struct {
 	URL         string   `json:"url"`
 	CSSSelector string   `json:"css"`
 	Emails      []string `json:"emails"`
+	FolderName  string   `json:"folder"`
 
 	id       string
 	lastFile string
@@ -124,7 +125,12 @@ func (w *Watcher) watch() (err error) {
 
 	h := sha1.New()
 	h.Write([]byte(w.URL + w.CSSSelector))
-	w.id = fmt.Sprintf("changes_%x", h.Sum(nil))
+	if w.FolderName == "" {
+		fmt.Println("Foldername", w.FolderName)
+		w.id = fmt.Sprintf("changes_%x", h.Sum(nil))
+	} else {
+		w.id = fmt.Sprintf("changes_%s", w.FolderName)
+	}
 	if !Exists(path.Join(flagFolder, w.id)) {
 		err = os.Mkdir(path.Join(flagFolder, w.id), os.ModePerm)
 		if err != nil {

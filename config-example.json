@@ -11,6 +11,7 @@
     {
         "url": "https://www.nytimes.com",
         "css": "h2 > span",
-        "emails": ["someone@somewhere.com"]
+        "emails": ["someone@somewhere.com"],
+        "folder": "nytimes"
     }]
 }
