@@ -16,17 +16,19 @@ Here is an example of a change detected from the New York times headlines.
 
 The previous state is shown in red and the new state is shown in green.
 
-The `config.json` used was:
+The `config.json` used was (note the folder key is optional and is used to customize the folder name of images for easier recognition.):
 
 ```javascript
 {
     "watchers": [
     {
         "url": "https://www.nytimes.com",
-        "css": "h2 > span"
+        "css": "h2 > span",
+        "folder": "nytimes"
     }]
 }
 ```
+
 ## Usage
 
 First make sure you have `node` and `go` installed on your system.
@@ -52,6 +54,12 @@ Now run. The first time you run it will download a HOSTS file that is used for f
 > ./websitechanges
 ```
 
+By default this will run every 5 minutes. You can adjust the delay by passing the `-delay 10` where 10 is the number of minutes to wait before the next run.
+
+```
+> ./websitechanges -delay 10
+```
+
 It automatically generates diff images everytime it encounters a change.
 
 ## Contributing
@@ -62,7 +70,6 @@ Pull requests are welcome. Feel free to...
 - Add new features
 - Fix bugs
 - Suggest improvements
-
 
 ## License
 
