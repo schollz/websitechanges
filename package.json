@@ -1,0 +1,12 @@
+{
+  "name": "websitechanges",
+  "version": "1.0.0",
+  "description": "Alerts you via email about a website change.",
+  "main": "screenshot.js",
+  "repository": "git@github.com:schollz/websitechanges.git",
+  "author": "schollz",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^19.10.1"
+  }
+}
