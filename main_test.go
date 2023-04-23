@@ -13,7 +13,14 @@ func TestRun(t *testing.T) {
 	// 	t.Errorf("errors: %s", err.Error())
 	// }
 	err := Watch([]Watcher{
-		Watcher{"https://www.nytimes.com", "span.balancedHeadline"},
+		{
+			"https://www.nytimes.com",
+			"span.balancedHeadline",
+			[]string{},
+			"",
+			"",
+			"",
+		},
 	})
 	if err != nil {
 		t.Errorf("errors: %s", err.Error())

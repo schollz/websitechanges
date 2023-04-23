@@ -180,7 +180,6 @@ func (w *Watcher) watch() (err error) {
 		_ = diffFilename
 		time.Sleep(time.Duration(*TimeTick) * time.Minute)
 	}
-	return
 }
 
 func (w *Watcher) info(s string) {
@@ -262,7 +261,7 @@ func diffImage(im1, im2, out string) (different bool, err error) {
 		return
 	}
 
-	err = jpeg.Encode(fSave, diffImg, &jpeg.Options{30})
+	err = jpeg.Encode(fSave, diffImg, &jpeg.Options{Quality: 30})
 	if err != nil {
 		log.Error(err)
 	}
@@ -309,7 +308,7 @@ func SendEmail(to, subject, markdown, attachment string) (err error) {
 	SMTPHost := config.Email.SMTPServer
 	SMTPPort := config.Email.SMTPPort
 	if smtpAuth == "" || smtpPass == "" {
-		err = fmt.Errorf("Must define environmental variables SMTPAUTH and SMTPPASS")
+		err = fmt.Errorf("must define environmental variables SMTPAUTH and SMTPPASS")
 		return
 	}
 
