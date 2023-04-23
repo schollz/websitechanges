@@ -16,8 +16,6 @@ github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db h1:62I3jR2Em
 github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db/go.mod h1:l0dey0ia/Uv7NcFFVbCLtqEBQbrT4OCwCSKTEv6enCw=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/schollz/go-diff-image v0.0.0-20200228175256-0c429f9a235a h1:wBY7D1LQ9lF5o0NY4vaa/d+U41ov8UsJ3DcSwjL76aY=
-github.com/schollz/go-diff-image v0.0.0-20200228175256-0c429f9a235a/go.mod h1:hryejq1v+OQE5v3YBvVRZq3AQGS6cxhwJvr9JLi/HeY=
 github.com/schollz/go-diff-image v1.0.1 h1:xTEg92elDms+kM/Gdl/IDHZQsQ4tkmrU+UZh+k47lTE=
 github.com/schollz/go-diff-image v1.0.1/go.mod h1:hryejq1v+OQE5v3YBvVRZq3AQGS6cxhwJvr9JLi/HeY=
 github.com/schollz/logger v1.2.0 h1:5WXfINRs3lEUTCZ7YXhj0uN+qukjizvITLm3Ca2m0Ho=
